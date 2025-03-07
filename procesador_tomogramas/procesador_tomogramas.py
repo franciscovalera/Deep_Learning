@@ -6,6 +6,11 @@ from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
+'''
+Se crea un modelo de segmentación de imágenes con una U-Net para segmentar tomogramas de células.
+'''
+
+
 #primero cargo los datos
 
 with mrcfile.open('./data/tomo.mrc') as f:
