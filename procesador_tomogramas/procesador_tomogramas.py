@@ -129,3 +129,4 @@ y_pred = np.argmax(y_pred, axis=-1)  # Convert one-hot encoded predictions to cl
 # Visualize a couple of slices
 visualize_results(X_val, y_val, y_pred, index=0)
 visualize_results(X_val, y_val, y_pred, index=1)
+visualize_results(X_val, y_val, y_pred, index=3)

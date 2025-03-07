@@ -8,3 +8,7 @@ Librerias utilizadas_
 -numpy
 -tensorflow
 -sklearn
+-mrcfile
+-matplotlib
+-keras
+-spicy
