@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from tensorflow import keras
-from tensorflow.keras import layers, Sequential, Model
+from tensorflow.keras import layers, Sequential, Model # type: ignore
 
 '''
 Programa que genera de manera aleatoria numeros entre 0 y 1, y los clasifica en dos clases dependiendo de 
