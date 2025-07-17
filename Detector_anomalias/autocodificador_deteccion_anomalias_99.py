@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 
 from collections import Counter
 
+from sklearn.metrics import recall_score, confusion_matrix, roc_curve
+from tensorflow.keras.metrics import SpecificityAtSensitivity
+from sklearn.preprocessing import StandardScaler
 
 # Descargar y leer el dataset
 
@@ -217,3 +220,66 @@ y_pred = (mae_test > umbral).astype(int)
 
 # Mostrar conteo de clasificados
 print("Conteo de predicciones en test:", Counter(y_pred))
+
+
+#Este codigo se utilizaria para prestaciones de sensibilidad mínima de detección de ECGs anómalos del 99%
+
+
+
+# 1. Calcular el umbral para sensibilidad >= 99%
+fpr, tpr, thresholds = roc_curve(y_test, mae_test)
+sensibilidad_deseada = 0.99
+idx = np.where(tpr >= sensibilidad_deseada)[0][0]
+umbral_99 = thresholds[idx]
+
+# Mostrar la curva ROC
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, label=f'ROC Curve (AUC = {np.trapz(tpr, fpr):.2f})', color='blue')
+plt.scatter(fpr[idx], tpr[idx], color='red', label=f'Umbral (Sensibilidad >= 99%)')
+plt.title('Curva ROC')
+plt.xlabel('Tasa de Falsos Positivos (FPR)')
+plt.ylabel('Tasa de Verdaderos Positivos (TPR)')
+plt.legend()
+plt.grid()
+plt.show()
+
+# 2. Calcular especificidad en ese umbral
+y_pred_99 = (mae_test > umbral_99).astype(int)
+cm = confusion_matrix(y_test, y_pred_99)
+tn, fp, fn, tp = cm.ravel()
+especificidad = tn / (tn + fp)
+sensibilidad = tp / (tp + fn)
+print(f"Umbral para sensibilidad >=99%: {umbral_99:.4f}")
+print(f"Sensibilidad alcanzada: {sensibilidad*100:.2f}%")
+print(f"Especificidad alcanzada: {especificidad*100:.2f}%")
+
+# 3. Experimento: cambiar tamaño de la pirámide (ejemplo con latent_dim=8)
+latent_dim_exp = 8
+autoencoder_exp = autoencoders[latent_dim_exp]
+decoded_test_exp = autoencoder_exp.predict(X_test)
+mae_test_exp = np.mean(np.abs(X_test - decoded_test_exp), axis=1)
+fpr_exp, tpr_exp, thresholds_exp = roc_curve(y_test, mae_test_exp)
+idx_exp = np.where(tpr_exp >= sensibilidad_deseada)[0][0]
+umbral_exp = thresholds_exp[idx_exp]
+y_pred_exp = (mae_test_exp > umbral_exp).astype(int)
+cm_exp = confusion_matrix(y_test, y_pred_exp)
+tn_exp, fp_exp, fn_exp, tp_exp = cm_exp.ravel()
+especificidad_exp = tn_exp / (tn_exp + fp_exp)
+print(f"\n[Latent dim={latent_dim_exp}] Especificidad con sensibilidad >=99%: {especificidad_exp*100:.2f}%")
+
+# 4. Experimento: estandarización inicial
+scaler = StandardScaler()
+X_train_std = scaler.fit_transform(X_train)
+X_test_std = scaler.transform(X_test)
+autoencoder_std = autoencoders[latent_dim]  # reutilizamos el modelo ya entrenado
+decoded_test_std = autoencoder_std.predict(X_test_std)
+mae_test_std = np.mean(np.abs(X_test_std - decoded_test_std), axis=1)
+fpr_std, tpr_std, thresholds_std = roc_curve(y_test, mae_test_std)
+idx_std = np.where(tpr_std >= sensibilidad_deseada)[0][0]
+umbral_std = thresholds_std[idx_std]
+y_pred_std = (mae_test_std > umbral_std).astype(int)
+cm_std = confusion_matrix(y_test, y_pred_std)
+tn_std, fp_std, fn_std, tp_std = cm_std.ravel()
+especificidad_std = tn_std / (tn_std + fp_std)
+print(f"\n[Estandarización] Especificidad con sensibilidad >=99%: {especificidad_std*100:.2f}%")
+
