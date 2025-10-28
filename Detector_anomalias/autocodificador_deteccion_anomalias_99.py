@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 from sklearn.metrics import recall_score, confusion_matrix, roc_curve
-from tensorflow.keras.metrics import SpecificityAtSensitivity
+from tensorflow.keras.metrics import SpecificityAtSensitivity # type: ignore
 from sklearn.preprocessing import StandardScaler
 
 # Descargar y leer el dataset

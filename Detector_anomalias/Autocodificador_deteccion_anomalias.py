@@ -4,16 +4,12 @@ Se va a utilizar la libreria polar por su superior rendimiento comparado a panda
 import numpy as np
 import polars as pl
 from sklearn.model_selection import train_test_split
-
-import tensorflow as tf
 from tensorflow import keras
 from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 
 from collections import Counter
 
-
-# Descargar y leer el dataset
 
 
 # Leer el CSV con Polars
